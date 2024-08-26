@@ -10,15 +10,13 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 
 public class BookService {
     private final Firestore db;
 
-     public BookService() {
-        this.db = FirestoreOptions.getDefaultInstance().getService();
+    public BookService() {
+        this.db = FirestoreOptions.getDefaultInstance().getService();  // Use the initialized Firestore instance
     }
 
     // Create a book
@@ -27,13 +25,14 @@ public class BookService {
         DocumentReference docRef = books.document(book.getId());
         ApiFuture<WriteResult> future = docRef.set(toMap(book));
         future.get(); // Wait for the write to complete
+        System.out.println("Book created with ID: " + book.getId());
     }
 
     // Read a book by ID
     public Book getBookById(String id) throws InterruptedException, ExecutionException {
         DocumentReference docRef = db.collection("books").document(id);
-        ApiFuture<com.google.cloud.firestore.DocumentSnapshot> future = docRef.get();
-        com.google.cloud.firestore.DocumentSnapshot document = future.get();
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot document = future.get();
         if (document.exists()) {
             return fromMap(document.getData());
         } else {
@@ -46,6 +45,7 @@ public class BookService {
         DocumentReference docRef = db.collection("books").document(book.getId());
         ApiFuture<WriteResult> future = docRef.update(toMap(book));
         future.get(); // Wait for the write to complete
+        System.out.println("Book updated with ID: " + book.getId());
     }
 
     // Delete a book
@@ -53,6 +53,7 @@ public class BookService {
         DocumentReference docRef = db.collection("books").document(id);
         ApiFuture<WriteResult> future = docRef.delete();
         future.get(); // Wait for the delete to complete
+        System.out.println("Book deleted with ID: " + id);
     }
 
     // Helper method to convert Book to Map
